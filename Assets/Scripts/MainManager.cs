@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class MainManager : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class MainManager : MonoBehaviour
     
     private bool m_Started = false;
     private int m_Points;
-    private int initPoints = 0;
+    private int highScore;
 
     private bool m_GameOver = false;
 
@@ -39,7 +40,7 @@ public class MainManager : MonoBehaviour
             }
         }
 
-        BestScoreText.text = "Best Score" + PersistanceManager.Instance.playerName + ": " + initPoints;
+        BestScoreText.text = "Best Score: " + PersistanceManager.Instance.playerName + ": " + PersistanceManager.Instance.score;
     }
 
     private void Update()
@@ -64,15 +65,19 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+
+        BestScoreText.text = "Best Score: " + PersistanceManager.Instance.playerName + ": " + PersistanceManager.Instance.score;
     }
 
     void AddPoint(int point)
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
-        if(m_Points > initPoints)
+        PersistanceManager.Instance.scoreSave = m_Points;
+        if (PersistanceManager.Instance.scoreSave > PersistanceManager.Instance.score)
         {
-            BestScoreText.text = "Best Score" + PersistanceManager.Instance.playerName + ": " + m_Points;
+            PersistanceManager.Instance.playerName = PersistanceManager.Instance.playerNameSave;
+            PersistanceManager.Instance.score = m_Points;
         }
     }
 
@@ -80,5 +85,6 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        PersistanceManager.Instance.SaveHighScore();
     }
 }
